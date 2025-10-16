@@ -71,8 +71,8 @@ You can change the default keyboard shortcuts in NVDA settings:
 ## Technical notes
 
 - The add-on monitors traffic across all active network interfaces (Ethernet, Wi-Fi, VPN, etc.)
-- Speed measurement is calculated as the difference in transmitted/received bytes between consecutive invocations
-- On first invocation after NVDA starts, there may be a brief delay during measurement initialization
+- Each measurement takes exactly 1 second - the add-on measures the actual speed at that moment by taking two measurements 1 second apart
+- When you press the keyboard shortcut, there will be a 1-second delay while measuring
 
 ## License
 
@@ -83,6 +83,11 @@ GPL v2
 Michał Dziwisz
 
 ## Version History
+
+### Version 1.1.0
+- Fixed speed measurement to be accurate - now measures actual current speed
+- Each measurement takes exactly 1 second (two measurements 1 second apart)
+- Removed unreliable "time since last measurement" method
 
 ### Version 1.0.0
 - Initial release

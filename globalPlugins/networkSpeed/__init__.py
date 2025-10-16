@@ -17,8 +17,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def __init__(self):
 		super(GlobalPlugin, self).__init__()
-		self.lastNetIO = None
-		self.lastTime = None
 
 		if psutil is None:
 			ui.message("Error: psutil library is not installed. Network Speed addon will not work.")
@@ -56,34 +54,23 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 			return "{:.2f} MB/s".format(mbytes)
 
 	def getNetworkSpeed(self):
-		"""Calculates current download and upload speed"""
+		"""Calculates current download and upload speed by measuring over 1 second"""
 		if psutil is None:
 			return None, None
 
 		try:
-			# Get current IO statistics for all network interfaces
-			currentNetIO = psutil.net_io_counters()
-			currentTime = time.time()
+			# First measurement
+			firstNetIO = psutil.net_io_counters()
 
-			if self.lastNetIO is None or self.lastTime is None:
-				# First measurement - store and wait for next
-				self.lastNetIO = currentNetIO
-				self.lastTime = currentTime
-				return None, None
+			# Wait exactly 1 second
+			time.sleep(1.0)
 
-			# Calculate time difference
-			timeDelta = currentTime - self.lastTime
-
-			if timeDelta == 0:
-				return None, None
+			# Second measurement
+			secondNetIO = psutil.net_io_counters()
 
 			# Calculate speeds (bytes per second)
-			downloadSpeed = (currentNetIO.bytes_recv - self.lastNetIO.bytes_recv) / timeDelta
-			uploadSpeed = (currentNetIO.bytes_sent - self.lastNetIO.bytes_sent) / timeDelta
-
-			# Store current values for future use
-			self.lastNetIO = currentNetIO
-			self.lastTime = currentTime
+			downloadSpeed = secondNetIO.bytes_recv - firstNetIO.bytes_recv
+			uploadSpeed = secondNetIO.bytes_sent - firstNetIO.bytes_sent
 
 			return downloadSpeed, uploadSpeed
 
@@ -102,17 +89,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 			ui.message("Network Speed addon requires psutil library")
 			return
 
-		# Get speeds
+		# Measure speed over 1 second
 		downloadSpeed, uploadSpeed = self.getNetworkSpeed()
 
 		if downloadSpeed is None or uploadSpeed is None:
-			# First measurement - wait a moment and try again
-			time.sleep(0.5)
-			downloadSpeed, uploadSpeed = self.getNetworkSpeed()
-
-			if downloadSpeed is None or uploadSpeed is None:
-				ui.message("Unable to measure speed. Please try again in a moment.")
-				return
+			ui.message("Unable to measure speed.")
+			return
 
 		# Format and announce result
 		downloadStr = self.formatSpeed(downloadSpeed)
@@ -132,17 +114,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 			ui.message("Network Speed addon requires psutil library")
 			return
 
-		# Get speeds
+		# Measure speed over 1 second
 		downloadSpeed, uploadSpeed = self.getNetworkSpeed()
 
 		if downloadSpeed is None or uploadSpeed is None:
-			# First measurement - wait a moment and try again
-			time.sleep(0.5)
-			downloadSpeed, uploadSpeed = self.getNetworkSpeed()
-
-			if downloadSpeed is None or uploadSpeed is None:
-				ui.message("Unable to measure speed. Please try again in a moment.")
-				return
+			ui.message("Unable to measure speed.")
+			return
 
 		# Format and announce result in bytes
 		downloadStr = self.formatSpeedBytes(downloadSpeed)
