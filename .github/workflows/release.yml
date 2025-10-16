@@ -1,0 +1,58 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Build NVDA add-on
+      run: |
+        cd $GITHUB_WORKSPACE
+        zip -r networkSpeed-${{ steps.get_version.outputs.VERSION }}.nvda-addon \
+          manifest.ini \
+          README.md \
+          globalPlugins/networkSpeed/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: networkSpeed-${{ steps.get_version.outputs.VERSION }}.nvda-addon
+        body: |
+          # Network Speed Monitor v${{ steps.get_version.outputs.VERSION }}
+
+          NVDA add-on for monitoring real-time network download and upload speeds.
+
+          ## Installation
+
+          1. Download the `.nvda-addon` file below
+          2. Run the file to install
+          3. Restart NVDA
+          4. Install psutil library (see README for instructions)
+
+          ## Usage
+
+          - **NVDA+Shift+N** - Announce speed in kbps/Mbps
+          - **NVDA+Shift+Control+N** - Announce speed in KB/s/MB/s
+
+          ## Requirements
+
+          - NVDA 2019.3 or later
+          - Python psutil library
+
+          For full documentation, see the [README](https://github.com/michaldziwisz/networkSpeed#readme)
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
