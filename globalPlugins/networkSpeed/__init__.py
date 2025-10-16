@@ -18,6 +18,10 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def __init__(self):
 		super(GlobalPlugin, self).__init__()
+		self.lastMessage = None
+		self.lastMessageBytes = None
+		self.lastCallTime = 0
+		self.lastCallTimeBytes = 0
 
 	def formatSpeed(self, bytesPerSecond):
 		"""Formats speed from bytes per second to kbps or Mbps"""
@@ -80,7 +84,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	)
 	def script_announceNetworkSpeed(self, gesture):
 		"""Script invoked by keyboard shortcut"""
-		# Measure speed over 1 second
+		# Check if this is a double-press (called within 0.5 seconds of last call END time)
+		currentTime = time.time()
+		timeSinceLastCall = currentTime - self.lastCallTime
+
+		if timeSinceLastCall < 0.5 and self.lastMessage:
+			# Double press - copy last message to clipboard
+			api.copyToClip(self.lastMessage)
+			ui.message("Copied to clipboard: {}".format(self.lastMessage))
+			# Don't update lastCallTime so triple-press won't trigger again
+			return
+
+		# Single press - measure speed over 1 second
 		downloadSpeed, uploadSpeed = self.getNetworkSpeed()
 
 		if downloadSpeed is None or uploadSpeed is None:
@@ -92,15 +107,11 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		uploadStr = self.formatSpeed(uploadSpeed)
 
 		message = "Download: {}, Upload: {}".format(downloadStr, uploadStr)
+		self.lastMessage = message
+		ui.message(message)
 
-		# Check if double-pressed
-		if scriptHandler.getLastScriptRepeatCount() == 1:
-			# Double press - copy to clipboard
-			api.copyToClip(message)
-			ui.message("Copied to clipboard")
-		else:
-			# Single press - speak the message
-			ui.message(message)
+		# Update last call time AFTER measurement completes
+		self.lastCallTime = time.time()
 
 	@scriptHandler.script(
 		description="Announces current download and upload speed in bytes. Press twice to copy to clipboard.",
@@ -109,7 +120,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	)
 	def script_announceNetworkSpeedBytes(self, gesture):
 		"""Script invoked by keyboard shortcut - bytes version"""
-		# Measure speed over 1 second
+		# Check if this is a double-press (called within 0.5 seconds of last call END time)
+		currentTime = time.time()
+		timeSinceLastCall = currentTime - self.lastCallTimeBytes
+
+		if timeSinceLastCall < 0.5 and self.lastMessageBytes:
+			# Double press - copy last message to clipboard
+			api.copyToClip(self.lastMessageBytes)
+			ui.message("Copied to clipboard: {}".format(self.lastMessageBytes))
+			# Don't update lastCallTimeBytes so triple-press won't trigger again
+			return
+
+		# Single press - measure speed over 1 second
 		downloadSpeed, uploadSpeed = self.getNetworkSpeed()
 
 		if downloadSpeed is None or uploadSpeed is None:
@@ -121,12 +143,8 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		uploadStr = self.formatSpeedBytes(uploadSpeed)
 
 		message = "Download: {}, Upload: {}".format(downloadStr, uploadStr)
+		self.lastMessageBytes = message
+		ui.message(message)
 
-		# Check if double-pressed
-		if scriptHandler.getLastScriptRepeatCount() == 1:
-			# Double press - copy to clipboard
-			api.copyToClip(message)
-			ui.message("Copied to clipboard")
-		else:
-			# Single press - speak the message
-			ui.message(message)
+		# Update last call time AFTER measurement completes
+		self.lastCallTimeBytes = time.time()

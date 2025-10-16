@@ -69,7 +69,8 @@ Michał Dziwisz
 ## Version History
 
 ### Version 1.3.0
-- **Added double-press feature** - press any shortcut twice quickly to copy the speed to clipboard
+- **Added double-press feature** - press any shortcut twice quickly (within 0.5 seconds) to copy the speed to clipboard
+- Double-press copies the last measurement instantly and announces the copied value
 - Enhanced usability for sharing network speed information
 
 ### Version 1.2.0
