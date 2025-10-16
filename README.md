@@ -30,7 +30,9 @@ An NVDA add-on that allows you to quickly check current download and upload spee
 After installing the add-on, you can use the following default keyboard shortcuts:
 
 - **NVDA+Shift+N** - Announces current download and upload speed in kbps/Mbps (bits - network standard)
+  - Press twice quickly to copy the speed to clipboard
 - **NVDA+Shift+Control+N** - Announces current download and upload speed in KB/s/MB/s (bytes - file download format)
+  - Press twice quickly to copy the speed to clipboard
 
 ### Changing keyboard shortcuts
 
@@ -65,6 +67,10 @@ This add-on includes the psutil library (BSD 3-Clause License). See LICENSE.txt 
 Michał Dziwisz
 
 ## Version History
+
+### Version 1.3.0
+- **Added double-press feature** - press any shortcut twice quickly to copy the speed to clipboard
+- Enhanced usability for sharing network speed information
 
 ### Version 1.2.0
 - **psutil library now included** - no additional installation required!

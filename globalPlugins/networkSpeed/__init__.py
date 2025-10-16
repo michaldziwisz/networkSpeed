@@ -7,6 +7,7 @@ import globalPluginHandler
 import ui
 import scriptHandler
 import time
+import api
 try:
 	import psutil
 except ImportError:
@@ -73,7 +74,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 			return None, None
 
 	@scriptHandler.script(
-		description="Announces current download and upload speed",
+		description="Announces current download and upload speed. Press twice to copy to clipboard.",
 		gesture="kb:NVDA+shift+n",
 		speakOnDemand=True
 	)
@@ -91,10 +92,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		uploadStr = self.formatSpeed(uploadSpeed)
 
 		message = "Download: {}, Upload: {}".format(downloadStr, uploadStr)
-		ui.message(message)
+
+		# Check if double-pressed
+		if scriptHandler.getLastScriptRepeatCount() == 1:
+			# Double press - copy to clipboard
+			api.copyToClip(message)
+			ui.message("Copied to clipboard")
+		else:
+			# Single press - speak the message
+			ui.message(message)
 
 	@scriptHandler.script(
-		description="Announces current download and upload speed in bytes",
+		description="Announces current download and upload speed in bytes. Press twice to copy to clipboard.",
 		gesture="kb:NVDA+shift+control+n",
 		speakOnDemand=True
 	)
@@ -112,4 +121,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		uploadStr = self.formatSpeedBytes(uploadSpeed)
 
 		message = "Download: {}, Upload: {}".format(downloadStr, uploadStr)
-		ui.message(message)
+
+		# Check if double-pressed
+		if scriptHandler.getLastScriptRepeatCount() == 1:
+			# Double press - copy to clipboard
+			api.copyToClip(message)
+			ui.message("Copied to clipboard")
+		else:
+			# Single press - speak the message
+			ui.message(message)
