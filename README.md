@@ -16,34 +16,14 @@ An NVDA add-on that allows you to quickly check current download and upload spee
 
 - NVDA version 2019.3 or newer
 - Python (built into NVDA)
-- `psutil` library (installation instructions below)
+
+**Note:** The psutil library is included with this add-on - no additional installation required!
 
 ## Installation
 
-### Step 1: Installing the psutil library
-
-The add-on requires the `psutil` library to monitor network statistics. To install it:
-
-1. Open the NVDA Python console:
-   - Press NVDA+Control+Z (opens Python console)
-
-2. In the console, enter the following commands:
-   ```python
-   import os
-   import subprocess
-   import sys
-
-   # Get NVDA's Python path
-   python_exe = sys.executable
-
-   # Install psutil
-   subprocess.check_call([python_exe, "-m", "pip", "install", "psutil"])
-   ```
-
-### Step 2: Installing the add-on
-
-1. Run the `.nvda-addon` file - NVDA will automatically install the add-on
-2. Restart NVDA
+1. Download the `.nvda-addon` file from the [releases page](https://github.com/michaldziwisz/networkSpeed/releases)
+2. Run the file - NVDA will automatically install the add-on
+3. Restart NVDA
 
 ## Usage
 
@@ -78,11 +58,19 @@ You can change the default keyboard shortcuts in NVDA settings:
 
 GPL v2
 
+This add-on includes the psutil library (BSD 3-Clause License). See LICENSE.txt for full license information.
+
 ## Author
 
 Michał Dziwisz
 
 ## Version History
+
+### Version 1.2.0
+- **psutil library now included** - no additional installation required!
+- Simplified installation process
+- Added LICENSE.txt with full license information for included libraries
+- Removed psutil installation instructions from documentation
 
 ### Version 1.1.0
 - Fixed speed measurement to be accurate - now measures actual current speed

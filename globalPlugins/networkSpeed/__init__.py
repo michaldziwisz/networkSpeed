@@ -18,9 +18,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def __init__(self):
 		super(GlobalPlugin, self).__init__()
 
-		if psutil is None:
-			ui.message("Error: psutil library is not installed. Network Speed addon will not work.")
-
 	def formatSpeed(self, bytesPerSecond):
 		"""Formats speed from bytes per second to kbps or Mbps"""
 		if bytesPerSecond is None:
@@ -55,9 +52,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def getNetworkSpeed(self):
 		"""Calculates current download and upload speed by measuring over 1 second"""
-		if psutil is None:
-			return None, None
-
 		try:
 			# First measurement
 			firstNetIO = psutil.net_io_counters()
@@ -85,10 +79,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	)
 	def script_announceNetworkSpeed(self, gesture):
 		"""Script invoked by keyboard shortcut"""
-		if psutil is None:
-			ui.message("Network Speed addon requires psutil library")
-			return
-
 		# Measure speed over 1 second
 		downloadSpeed, uploadSpeed = self.getNetworkSpeed()
 
@@ -110,10 +100,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	)
 	def script_announceNetworkSpeedBytes(self, gesture):
 		"""Script invoked by keyboard shortcut - bytes version"""
-		if psutil is None:
-			ui.message("Network Speed addon requires psutil library")
-			return
-
 		# Measure speed over 1 second
 		downloadSpeed, uploadSpeed = self.getNetworkSpeed()
 
